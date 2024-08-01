@@ -1,0 +1,3 @@
+[submodule "api_consumer"]
+	path = api_consumer
+	url = https://github.com/Diegogp95/apis_cli

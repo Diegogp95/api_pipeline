@@ -1,0 +1,9 @@
+## Confidential
+*.env
+config_json
+
+## Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
