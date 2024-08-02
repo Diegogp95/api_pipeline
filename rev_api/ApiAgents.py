@@ -5,8 +5,9 @@ import logging
 
 ENV_FILE = 'dev.env'
 
-load_dotenv(ENV_FILE)
-load_dotenv('paths.env')
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ENV_FILE))
+load_dotenv(os.path.join(os.path.dirname(__file__), 'paths.env'))
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +26,9 @@ class APIAgent:
     def __init__(self, prefix='API_'):
         self.username = os.getenv(prefix+'USERNAME')
         self.password = os.getenv(prefix+'PASSWORD')
-        if os.path.exists('config.json'):
-            with open('config.json', 'r') as f:
+        self.config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+        if os.path.exists(self.config_path):
+            with open(self.config_path, 'r') as f:
                 try:
                     config = json.load(f)
                 except json.JSONDecodeError:
@@ -45,7 +47,7 @@ class APIAgent:
         return
     
     def init_config(self):
-        with open('config.json', 'w') as f:
+        with open(self.config_path, 'w') as f:
             f.write(json.dumps(
                 {
                     'username': self.username,
@@ -58,12 +60,12 @@ class APIAgent:
     
     def save_config(self, config):
         try:
-            with open('config.json', 'r') as f:
+            with open(self.config_path, 'r') as f:
                 data = json.load(f)
         except FileNotFoundError:
             data = {}
         data.update(config)
-        with open('config.json', 'w') as f:
+        with open(self.config_path, 'w') as f:
             f.write(json.dumps(data, indent=4))
         return
     
@@ -77,8 +79,10 @@ class APIAgent:
             response_json = response.json()
             self.access_token = response_json['access']
             self.refresh_token = response_json['refresh']
-            self.save_config({'access_token': self.access_token,
-                            'refresh_token': self.refresh_token})
+            self.save_config({
+                'username': self.username,
+                'access_token': self.access_token,
+                'refresh_token': self.refresh_token})
         else:
             raise LoginFailedException('Login failed')
         return
@@ -199,6 +203,8 @@ class APIAgent:
         if response.status_code == 201:
             response_json = response.json()
             return response_json
+        elif response.status_code == 400:
+            logger.error(response.json())
         return None
 
     def post_weather_measurements(self, plant_id, data):
@@ -209,6 +215,8 @@ class APIAgent:
         if response.status_code == 201:
             response_json = response.json()
             return response_json
+        elif response.status_code == 400:
+            logger.error(response.json())
         return None
 
     def update_gen_measurement(self, plant_id, data):
@@ -243,7 +251,6 @@ class APIAgent:
         return None
 
     def post_incidents(self, plant_id, table, data):
-        print(data)
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_INCIDENTS')
                        ).replace('?plant', plant_id).replace('?table', table)
         response = requests.post(PATH, headers={
@@ -252,7 +259,7 @@ class APIAgent:
         if response.status_code == 201:
             response_json = response.json()
             return response_json
-        else:
+        elif response.status_code == 400:
             logger.error(response.json())
         return None
 

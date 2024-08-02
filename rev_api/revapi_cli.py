@@ -1,10 +1,10 @@
 import sys, getopt
-from MiddlewareAgent import MiddlewareAgent, setup_logger
+from .MiddlewareAgent import MiddlewareAgent, setup_logger
 from requests.exceptions import ConnectionError
 
-options="hl:Ardf:q:"
+options="hl:Ardf:i:q:t:"
 long_options=["help", "log_level=", "admin", "range", "detailed",
-               "file=", "query="]
+               "file=", "id=", "query=", "table="]
 
 help_message = """
 Usage: revapi_cli.py [options] operation
@@ -23,6 +23,7 @@ Options:
                             will be prompted to enter the path to the file.
     -i, --id                Set the id (portfolio/plant) for the operations.
     -q, --query             Set the query parameters for the operations.
+    -t, --table             Set the table name for post_incidents operation.
     
 
 Operations:
@@ -69,11 +70,12 @@ def main(argv):
     data_path = None
     query = None
     id = None
+    table = None
 
     try:
         opts, args = getopt.gnu_getopt(argv, options, long_options)
-    except getopt.GetoptError:
-        logger.error("Invalid arguments")
+    except getopt.GetoptError as e:
+        print(e)
         print('Invalid arguments')
         sys.exit(2)
     for opt, arg in opts:
@@ -82,7 +84,6 @@ def main(argv):
             sys.exit()
         elif opt in ("-l", "--log_level"):
             if arg not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
-                logger.error("Invalid log level")
                 print("Invalid log level")
                 sys.exit(2)
             log_level = arg
@@ -98,11 +99,16 @@ def main(argv):
             query = arg
         elif opt in ("-i", "--id"):
             id = arg
+        elif opt in ("-t", "--table"):
+            table = arg
+            if table not in ['gen', 'weather']:
+                print("Invalid table name")
+                sys.exit(2)
 
     logger = setup_logger(log_level)
 
-    agent = MiddlewareAgent("admin" if admin else "user",
-                            log_level, data_path, query, id)
+    agent = MiddlewareAgent("admin" if admin else "user", log_level,
+                            data_path, query, id, table)
     try:
         if agent.auth() is False:
             print("Authentication failed")

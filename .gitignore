@@ -1,0 +1,17 @@
+## Confidential
+*.env
+**/config.json
+
+
+## Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+## data
+data_output/
+**/data_output/
+imputed/
+**/imputed/
+**/plantsMap.py

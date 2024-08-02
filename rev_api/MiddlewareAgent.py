@@ -1,8 +1,8 @@
 import json
 import getpass, re, os, logging
 from time import sleep
-from ApiAgents import APIAdminAgent, APIAgent
-from FileSelector import JsonFileSelector
+from .ApiAgents import APIAdminAgent, APIAgent
+from .FileSelector import JsonFileSelector
 import unicodedata
 
 
@@ -24,7 +24,8 @@ def is_float(value):
 
 
 class MiddlewareAgent:
-    def __init__(self, agent, logger_level, data_path=None, query=None, id=None):
+    def __init__(self, agent, logger_level, data_path=None, query=None,
+                 id=None, table=None):
         if agent == "admin":
             self.agent = APIAdminAgent()
         elif agent == "user":
@@ -37,6 +38,7 @@ class MiddlewareAgent:
         self.data_path = data_path
         self.query = query
         self.id = id
+        self.table = table
         return
     
     def auth(self):
@@ -334,6 +336,8 @@ class MiddlewareAgent:
     def id_dependent_method_with_data(self, method_str):
         msg = f"{'portfolio' if 'portfolio' in method_str else 'plant'} id: "
         if self.id is not None:
+            id_str = self.id
+        else:
             id_str = input("Enter " + msg).strip()
             while not id_str or not id_str.isdigit():
                 print("Invalid " + msg)
@@ -342,14 +346,14 @@ class MiddlewareAgent:
             self.select_data_path()
         data = self.load_data()
         if data is None:
-            self.logger.error("Data load failed")
+            self.logger.error(f"Data load failed for {method_str}")
             return
         response = getattr(self.agent, method_str)(id_str, data)
         if response is not None:
             self.logger.info(f'Successful operation {method_str.upper()}')
             self.logger.debug(json.dumps(response, indent=4))
         else:
-            self.logger.error("Operation failed")
+            self.logger.error(f"Operation {method_str} failed")
         return
 
     def enter_query_params(self, query_params):
@@ -397,10 +401,13 @@ class MiddlewareAgent:
         if data is None:
             self.logger.error("Data load failed")
             return
-        table = input("Enter table: ")
-        while table not in ["gen", "weather"]:
-            print("Invalid table")
+        if self.table is not None:
+            table = self.table
+        else:
             table = input("Enter table: ")
+            while table not in ["gen", "weather"]:
+                print("Invalid table")
+                table = input("Enter table: ")
         response = self.agent.post_incidents(plant_id, table, data)
         if response is not None:
             self.logger.info("Incident posted successfully")
