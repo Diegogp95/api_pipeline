@@ -419,10 +419,13 @@ class APIAdminAgent(APIAgent):
     def create_profile(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('CREATE_PROFILE'))
         response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, json=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 201:
             response_json = response.json()
             return response_json
+        elif response.status_code == 400:
+            logger.error(response.json())
         return None
 
     def profile_list(self):
@@ -446,7 +449,8 @@ class APIAdminAgent(APIAgent):
     def update_profile(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PROFILE')).replace('?profile', str(data['id']))
         response = requests.put(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, data=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 200:
             response_json = response.json()
             return response_json
@@ -457,7 +461,8 @@ class APIAdminAgent(APIAgent):
     def create_portfolio(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('CREATE_PORTFOLIO'))
         response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, data=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 201:
             response_json = response.json()
             return response_json
@@ -475,7 +480,8 @@ class APIAdminAgent(APIAgent):
     def update_portfolio(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PORTFOLIO')).replace('?portfolio', str(data['id']))
         response = requests.put(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, data=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 200:
             response_json = response.json()
             return response_json
@@ -484,7 +490,8 @@ class APIAdminAgent(APIAgent):
     def create_plant(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('CREATE_PLANT'))
         response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, data=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 201:
             response_json = response.json()
             return response_json
@@ -507,7 +514,8 @@ class APIAdminAgent(APIAgent):
     def update_plant(self, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PLANT')).replace('?plant', str(data['plant_id']))
         response = requests.put(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}'}, data=data)
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
         if response.status_code == 200:
             response_json = response.json()
             return response_json

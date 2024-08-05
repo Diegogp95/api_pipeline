@@ -112,11 +112,11 @@ def main(argv):
     try:
         if date_or_range == 'd':
             date = input("Enter the date: ")
-            pipeline = DataPipeline(plants, date)
+            pipeline = DataPipeline(plants, date=date)
         else:
             start_date = input("Enter the start date: ")
             end_date = input("Enter the end date: ")
-            pipeline = DataPipeline(plants, start_date, end_date)
+            pipeline = DataPipeline(plants, start_date=start_date, end_date=end_date)
     except ValueError as e:
         print(e)
         sys.exit(1)

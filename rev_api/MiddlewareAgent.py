@@ -72,10 +72,24 @@ class MiddlewareAgent:
             },
             **({"portfolios": portfolios} if portfolios else {})
         }
+        return json.dumps(new_profile)
+    
+    def profile_data_creation(self):
+        if self.data_path is not None:
+            new_profile = self.load_data()
+        else:
+            mode = ''
+            while mode.lower() not in ['m', 'f']:
+                mode = input("Enter profile manually or select file? (m/f): ")
+                if mode.lower() == "m":
+                    new_profile = self.input_profile()
+                elif mode.lower() == "f":
+                    data_path = self.select_data_path()
+                    new_profile = self.load_data()
         return new_profile
     
     def create_profile(self):
-        new_profile = self.input_profile()
+        new_profile = self.profile_data_creation()
         response = self.agent.create_profile(new_profile)
         if response is not None:
             self.logger.info("Profile created successfully")
@@ -89,7 +103,7 @@ class MiddlewareAgent:
         if not profile_id or not profile_id.isdigit():
             self.logger.error("Invalid profile id")
             return
-        new_profile = self.input_profile()
+        new_profile = self.profile_data_creation()
         new_profile["id"] = int(profile_id)
         logging.debug(new_profile)
         response = self.agent.update_profile(new_profile)
@@ -164,8 +178,22 @@ class MiddlewareAgent:
         }
         return new_portfolio
 
+    def portfolio_data_creation(self):
+        if self.data_path is not None:
+            new_portfolio = self.load_data()
+        else:
+            mode = ''
+            while mode.lower() not in ['m', 'f']:
+                mode = input("Enter portfolio manually or select file? (m/f): ")
+                if mode.lower() == "m":
+                    new_portfolio = self.input_portfolio()
+                elif mode.lower() == "f":
+                    data_path = self.select_data_path()
+                    new_portfolio = self.load_data()
+        return json.dumps(new_portfolio)
+
     def create_portfolio(self):
-        new_portfolio = self.input_portfolio()
+        new_portfolio = self.portfolio_data_creation()
         response = self.agent.create_portfolio(new_portfolio)
         if response is not None:
             self.logger.info("Portfolio created successfully")
@@ -179,7 +207,7 @@ class MiddlewareAgent:
         if not portfolio_id or not portfolio_id.isdigit():
             self.logger.error("Invalid portfolio id")
             return
-        new_portfolio = self.input_portfolio()
+        new_portfolio = self.portfolio_data_creation()
         new_portfolio["id"] = int(portfolio_id)
         response = self.agent.update_portfolio(new_portfolio)
         if response is not None:
@@ -256,8 +284,22 @@ class MiddlewareAgent:
             new_plant["tz"] = tz
         return new_plant
 
+    def plant_data_creation(self):
+        if self.data_path is not None:
+            new_plant = self.load_data()
+        else:
+            mode = ''
+            while mode.lower() not in ['m', 'f']:
+                mode = input("Enter plant manually or select file? (m/f): ")
+                if mode.lower() == "m":
+                    new_plant = self.input_plant()
+                elif mode.lower() == "f":
+                    data_path = self.select_data_path()
+                    new_plant = self.load_data()
+        return json.dumps(new_plant)
+
     def create_plant(self):
-        new_plant = self.input_plant()
+        new_plant = self.plant_data_creation()
         response = self.agent.create_plant(new_plant)
         if response is not None:
             self.logger.info("Plant created successfully")
@@ -267,7 +309,7 @@ class MiddlewareAgent:
         return
 
     def update_plant(self):
-        new_plant = self.input_plant()
+        new_plant = self.plant_data_creation()
         response = self.agent.update_plant(new_plant)
         if response is not None:
             self.logger.info("Plant updated successfully")
