@@ -176,7 +176,7 @@ class MiddlewareAgent:
             "name": name,
             "country": country
         }
-        return new_portfolio
+        return json.dumps(new_portfolio)
 
     def portfolio_data_creation(self):
         if self.data_path is not None:
@@ -190,7 +190,7 @@ class MiddlewareAgent:
                 elif mode.lower() == "f":
                     data_path = self.select_data_path()
                     new_portfolio = self.load_data()
-        return json.dumps(new_portfolio)
+        return new_portfolio
 
     def create_portfolio(self):
         new_portfolio = self.portfolio_data_creation()
@@ -282,7 +282,7 @@ class MiddlewareAgent:
             new_plant["operator"] = operator
         if tz:
             new_plant["tz"] = tz
-        return new_plant
+        return json.dumps(new_plant)
 
     def plant_data_creation(self):
         if self.data_path is not None:
@@ -296,7 +296,7 @@ class MiddlewareAgent:
                 elif mode.lower() == "f":
                     data_path = self.select_data_path()
                     new_plant = self.load_data()
-        return json.dumps(new_plant)
+        return new_plant
 
     def create_plant(self):
         new_plant = self.plant_data_creation()

@@ -93,13 +93,13 @@ class DataPipeline:
 
     def upload_data(self):
         for index, plant_id in enumerate(self.plant_ids):
-            args = ['post_gen_measurements', '-i', str(plant_id), '-f', self.imputed_gen_paths[index]]
+            args = ['post_gen_measurements', '-i', str(plant_id), '-f', self.imputed_gen_paths[index], '-A']
             revapi_cli.main(args)
-            args = ['post_weather_measurements', '-i', str(plant_id), '-f', self.imputed_weather_paths[index]]
+            args = ['post_weather_measurements', '-i', str(plant_id), '-f', self.imputed_weather_paths[index], '-A']
             revapi_cli.main(args)
-            args = ['post_incidents', '-i', str(plant_id), '-f', self.incidents_gen_paths[index], '-t', 'gen']
+            args = ['post_incidents', '-i', str(plant_id), '-f', self.incidents_gen_paths[index], '-t', 'gen', '-A']
             revapi_cli.main(args)
-            args = ['post_incidents', '-i', str(plant_id), '-f', self.incidents_weather_paths[index], '-t', 'weather']
+            args = ['post_incidents', '-i', str(plant_id), '-f', self.incidents_weather_paths[index], '-t', 'weather', '-A']
             revapi_cli.main(args)
         self.logger.info("Data uploaded successfully")
         return

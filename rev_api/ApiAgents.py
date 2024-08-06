@@ -84,6 +84,7 @@ class APIAgent:
                 'access_token': self.access_token,
                 'refresh_token': self.refresh_token})
         else:
+            logger.error(response.json())
             raise LoginFailedException('Login failed')
         return
     
@@ -509,14 +510,25 @@ class APIAdminAgent(APIAgent):
         if response.status_code == 200:
             response_json = response.json()
             return response_json
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while listing plants")
         return None
 
     def update_plant(self, data):
-        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PLANT')).replace('?plant', str(data['plant_id']))
+        plant_id = json.loads(data)['plant_id']
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PLANT')).replace('?plant', str(plant_id))
         response = requests.put(PATH, headers={
                                 'Authorization': f'Bearer {self.access_token}',
                                 'content-type': 'application/json'}, data=data)
         if response.status_code == 200:
             response_json = response.json()
             return response_json
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while updating plant")
         return None
