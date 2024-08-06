@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from urllib.parse import urljoin
 import logging
 
-ENV_FILE = 'dev.env'
+ENV_FILE = 'prod.env'
 
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ENV_FILE))
@@ -184,6 +184,11 @@ class APIAgent:
         if response.status_code == 200:
             response_json = response.json()
             return response_json
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while getting gen measurements")
         return None
 
     def get_weather_measurements(self, plant_id, query_params):
@@ -194,31 +199,65 @@ class APIAgent:
         if response.status_code == 200:
             response_json = response.json()
             return response_json
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while getting weather measurements")
         return None
 
-    def post_gen_measurements(self, plant_id, data):
-        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_GEN_MEAS')).replace('?plant', plant_id)
-        response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}',
-                                'content-type': 'application/json'}, data=data)
-        if response.status_code == 201:
-            response_json = response.json()
-            return response_json
-        elif response.status_code == 400:
-            logger.error(response.json())
-        return None
+    def post_gen_measurements(self, plant_id, data, chunk_size=500):
+        data_list = json.loads(data)
+        total_parts = (len(data_list) + chunk_size - 1) // chunk_size
 
-    def post_weather_measurements(self, plant_id, data):
-        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_WEATHER_MEAS')).replace('?plant', plant_id)
-        response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}',
-                                'content-type': 'application/json'}, data=data)
-        if response.status_code == 201:
-            response_json = response.json()
-            return response_json
-        elif response.status_code == 400:
-            logger.error(response.json())
-        return None
+        for i in range(total_parts):
+            chunk = data_list[i*chunk_size : (i+1)*chunk_size]
+            chunk_data = json.dumps(chunk)
+
+            PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_GEN_MEAS')).replace('?plant', plant_id)
+            response = requests.post(PATH, headers={
+                                        'Authorization': f'Bearer {self.access_token}',
+                                        'content-type': 'application/json'}, data=chunk_data)
+
+            if response.status_code == 201:
+                response_json = response.json()
+                logger.info(f"Gen: Part {i+1}/{total_parts} uploaded successfully.")
+            elif response.status_code == 400:
+                logger.error(response.json())
+                return None
+            elif response.status_code == 413:
+                logger.error(response.json())
+                logger.error("Gen: Payload too large. Consider reducing the chunk size.")
+                return None
+            else:
+                logger.error(f"Gen: Failed to upload part {i+1}/{total_parts}. Status code: {response.status_code}")
+                return None
+        return True
+
+    def post_weather_measurements(self, plant_id, data, chunk_size=500):
+        data_list = json.loads(data)
+        total_parts = (len(data_list) + chunk_size - 1) // chunk_size
+
+        for i in range(total_parts):
+            chunk = data_list[i*chunk_size : (i+1)*chunk_size]
+            chunk_data = json.dumps(chunk)
+            PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_WEATHER_MEAS')).replace('?plant', plant_id)
+            response = requests.post(PATH, headers={
+                                        'Authorization': f'Bearer {self.access_token}',
+                                        'content-type': 'application/json'}, data=chunk_data)
+
+            if response.status_code == 201:
+                logger.info(f"Weather: Part {i+1}/{total_parts} uploaded successfully.")
+            elif response.status_code == 400:
+                logger.error(response.json())
+                return None
+            elif response.status_code == 413:
+                logger.error("Weather: Payload too large. Consider reducing the chunk size.")
+                return None
+            else:
+                logger.error(f"Weather: Failed to upload part {i+1}/{total_parts}. Status code: {response.status_code}")
+                return None
+        return True
 
     def update_gen_measurement(self, plant_id, data):
         PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_GEN_MEAS')).replace('?plant', plant_id)

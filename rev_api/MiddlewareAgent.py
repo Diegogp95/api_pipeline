@@ -491,7 +491,7 @@ class MiddlewareAgent:
                     self.logger.info("Task is pending")
                     result = getattr(self.agent, reulst_method_str)(plant_id, task_id)
                     status = result["status"]
-                    sleep(0.2)
+                    sleep(0.75)
                 if status == "success":
                     self.logger.info("Task completed successfully")
                     self.logger.debug(json.dumps(result, indent=4))
