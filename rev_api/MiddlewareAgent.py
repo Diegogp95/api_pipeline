@@ -126,6 +126,8 @@ class MiddlewareAgent:
             "create_plant",
             "list_plants",
             "update_plant",
+            "delete_gen_measurement",
+            "delete_weather_measurement",
         ]:
             if not isinstance(self.agent, APIAdminAgent):
                 self.logger.error(f"Operation {operation.upper()} not allowed for user")

@@ -571,3 +571,31 @@ class APIAdminAgent(APIAgent):
             except:
                 logger.error("Unknown error while updating plant")
         return None
+
+    def delete_gen_measurement(self, plant_id, query_params):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('DELETE_GEN_MEAS')
+                       ).replace('?plant', plant_id).replace('?query_params', query_params)
+        response = requests.delete(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}'})
+        if response.status_code == 204:
+            return {"message": "Gen measurements deleted successfully"}
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while deleting gen measurements")
+        return None
+
+    def delete_weather_measurement(self, plant_id, query_params):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('DELETE_WEATHER_MEAS')
+                       ).replace('?plant', plant_id).replace('?query_params', query_params)
+        response = requests.delete(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}'})
+        if response.status_code == 204:
+            return {"message": "Weather measurements deleted successfully"}
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while deleting weather measurements")
+        return None

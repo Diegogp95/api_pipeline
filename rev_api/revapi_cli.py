@@ -48,6 +48,8 @@ Operations:
     post_weather_measurements
     update_gen_measurements
     update_weather_measurements
+    delete_gen_measurement (admin)
+    delete_weather_measurement (admin)
     get_gen_measurements
     get_weather_measurements
     get_incidents
@@ -208,6 +210,8 @@ def main(argv):
             "generate_daily_metrics",
             "calculate_data",
             "recalculate_data",
+            "delete_gen_measurement",
+            "delete_weather_measurement",
         ]:
             agent.generate_methods(operation, query_params)
             return
