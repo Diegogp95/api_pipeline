@@ -450,6 +450,43 @@ class APIAgent:
             return response_json
         return None
 
+    def get_prmt_measurements(self, plant_id, query_params):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('GET_PRMT_MEAS')
+                       ).replace('?plant', plant_id).replace('?query_params', query_params)
+        response = requests.get(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}'})
+        if response.status_code == 200:
+            response_json = response.json()
+            return response_json
+        else:
+            try:
+                logger.error(response.json())
+            except:
+                logger.error("Unknown error while getting prmt measurements")
+        return None
+
+    def post_prmt_measurements(self, plant_id, data):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_PRMT_MEAS')).replace('?plant', plant_id)
+        response = requests.post(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
+        if response.status_code == 201:
+            response_json = response.json()
+            return response_json
+        elif response.status_code == 400:
+            logger.error(response.json())
+        return None
+
+    def update_prmt_measurement(self, plant_id, data):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('UPDATE_PRMT_MEAS')).replace('?plant', plant_id)
+        response = requests.put(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}',
+                                'content-type': 'application/json'}, data=data)
+        if response.status_code == 200:
+            response_json = response.json()
+            return response_json
+        return None
+
 
 class APIAdminAgent(APIAgent):
     def __init__(self):

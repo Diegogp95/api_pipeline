@@ -1,15 +1,11 @@
 import json
-import getpass, re, os, logging
+import getpass, re, os
 from time import sleep
 from .ApiAgents import APIAdminAgent, APIAgent
 from .FileSelector import JsonFileSelector
 import unicodedata
+from utils.utils import setup_logger
 
-
-def setup_logger(log_level):
-    numeric_level = getattr(logging, log_level.upper(), logging.INFO)
-    logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
-    return logging.getLogger(__name__)
 
 def is_valid_email(email):
     return re.match(r"[^@]+@[^@]+\.[^@]+", email)
@@ -105,7 +101,7 @@ class MiddlewareAgent:
             return
         new_profile = self.profile_data_creation()
         new_profile["id"] = int(profile_id)
-        logging.debug(new_profile)
+        self.logger.debug(new_profile)
         response = self.agent.update_profile(new_profile)
         if response is not None:
             self.logger.info("Profile updated successfully")
@@ -160,6 +156,9 @@ class MiddlewareAgent:
                 "calculate_data_result",
                 "recalculate_data",
                 "recalculate_data_result",
+                "get_prmt_measurements",
+                "post_prmt_measurements",
+                "update_prmt_measurements",
             ]:
                 self.logger.error(f"Operation {operation.upper()} not found")
                 return False

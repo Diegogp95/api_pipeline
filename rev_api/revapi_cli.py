@@ -61,6 +61,9 @@ Operations:
     generate_daily_metrics
     calculate_data
     recalculate_data
+    get_prmt_measurements
+    post_prmt_measurements
+    update_prmt_measurements
 """
 
 
@@ -189,6 +192,8 @@ def main(argv):
             "post_weather_measurements",
             "update_gen_measurements",
             "update_weather_measurements",
+            "post_prmt_measurements",
+            "update_prmt_measurements",
         ]:
             agent.id_dependent_method_with_data(operation)
             return
@@ -199,8 +204,9 @@ def main(argv):
             "get_incidents",
             "get_hper",
             "get_daily_availability",
-              "get_daily_metrics",
-            ]:
+            "get_daily_metrics",
+            "get_prmt_measurements",
+        ]:
             agent.id_query_dependent_method(operation, query_params)
             return
 
