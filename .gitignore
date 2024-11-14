@@ -15,3 +15,8 @@ data_output/
 imputed/
 **/imputed/
 **/plantsMap.py
+
+
+prmt_api/data
+prmt_data/
+data_for_prod
