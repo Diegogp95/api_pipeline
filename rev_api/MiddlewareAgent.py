@@ -159,6 +159,7 @@ class MiddlewareAgent:
                 "get_prmt_measurements",
                 "post_prmt_measurements",
                 "update_prmt_measurements",
+                "recalculate_monthly_data",
             ]:
                 self.logger.error(f"Operation {operation.upper()} not found")
                 return False

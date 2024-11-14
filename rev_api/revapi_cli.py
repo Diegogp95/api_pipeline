@@ -64,6 +64,7 @@ Operations:
     get_prmt_measurements
     post_prmt_measurements
     update_prmt_measurements
+    recalculate_monthly_data (admin)
 """
 
 
@@ -138,6 +139,10 @@ def main(argv):
     
     if operation == 'recalculate_data':
         query_params.append('force')
+
+    if operation == 'recalculate_monthly_data':
+        query_params.pop(0)
+        query_params.append('months')
 
     try:
         if operation == "create_profile":
@@ -218,6 +223,7 @@ def main(argv):
             "recalculate_data",
             "delete_gen_measurement",
             "delete_weather_measurement",
+            "recalculate_monthly_data",
         ]:
             agent.generate_methods(operation, query_params)
             return

@@ -290,18 +290,31 @@ class APIAgent:
             return response_json
         return None
 
-    def post_incidents(self, plant_id, table, data):
-        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_INCIDENTS')
-                       ).replace('?plant', plant_id).replace('?table', table)
-        response = requests.post(PATH, headers={
-                                'Authorization': f'Bearer {self.access_token}',
-                                'content-type': 'application/json'}, data=data)
-        if response.status_code == 201:
-            response_json = response.json()
-            return response_json
-        elif response.status_code == 400:
-            logger.error(response.json())
-        return None
+    def post_incidents(self, plant_id, table, data, chunk_size=500):
+        data_list = json.loads(data)
+        total_parts = (len(data_list) + chunk_size - 1) // chunk_size
+
+        for i in range(total_parts):
+            chunk = data_list[i*chunk_size : (i+1)*chunk_size]
+            chunk_data = json.dumps(chunk)
+
+            PATH = urljoin(os.getenv('BASE_URL'), os.getenv('POST_INCIDENTS')
+                           ).replace('?plant', plant_id).replace('?table', table)
+            response = requests.post(PATH, headers={
+                                    'Authorization': f'Bearer {self.access_token}',
+                                    'content-type': 'application/json'}, data=chunk_data)
+            if response.status_code == 201:
+                logger.info(f"Incidents: Part {i+1}/{total_parts} uploaded successfully.")
+            elif response.status_code == 400:
+                logger.error(response.json())
+                return None
+            elif response.status_code == 413:
+                logger.error("Incidents: Payload too large. Consider reducing the chunk size.")
+                return None
+            else:
+                logger.error(f"Incidents: Failed to upload part {i+1}/{total_parts}. Status code: {response.status_code}")
+                return None
+        return True
 
     ## export and import might be implemented
 
@@ -483,6 +496,29 @@ class APIAgent:
                                 'Authorization': f'Bearer {self.access_token}',
                                 'content-type': 'application/json'}, data=data)
         if response.status_code == 200:
+            response_json = response.json()
+            return response_json
+        return None
+
+    def recalculate_monthly_data(self, plant_id, query_params):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('RECALCULATE_MONTHLY_DATA')
+                       ).replace('?plant', plant_id).replace('?query_params', query_params)
+        response = requests.get(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}'})
+        if response.status_code == 200:
+            response_json = response.json()
+            return response_json
+        return None
+
+    def recalculate_monthly_data_result(self, plant_id, task_id):
+        PATH = urljoin(os.getenv('BASE_URL'), os.getenv('RECALCULATE_MONTHLY_DATA_RESULT')
+                       ).replace('?plant', plant_id)
+        response = requests.post(PATH, headers={
+                                'Authorization': f'Bearer {self.access_token}'}, data={'task_id': task_id})
+        if response.status_code in [200, 201]:
+            response_json = response.json()
+            return response_json
+        elif response.status_code in [400, 404, 500, 202]:
             response_json = response.json()
             return response_json
         return None
