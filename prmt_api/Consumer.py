@@ -15,7 +15,8 @@ class Consumer:
         }
         self.plant = plant
         try:
-            self.point = measurementPointsMap[plant]
+            self.point = measurementPointsMap[plant]['mPoint']
+            self.channel = measurementPointsMap[plant]['channel']
         except KeyError:
             raise ValueError(f"Invalid plant name: {plant}")
         self.logger = setup_logger('INFO')
@@ -55,7 +56,7 @@ class Consumer:
         for measurement in data['measurement']:
             formatted_data.append({
                 'timestamp': measurement['dateRange'].split('.')[0],
-                'act_energy': measurement['channel3'],
+                'act_energy': measurement['channel' + self.channel],
             })
         return formatted_data
 

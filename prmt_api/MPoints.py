@@ -45,15 +45,48 @@ measurement_points = [
 
 
 measurementPointsMap = {
-    "Margarita": "MRCHIGUE_013_PMGD5_TPE",
-    "La_Foresta": "HUALANE_013_PMGD1_LFT",
-    "Duqueco": "DUQUECO_023_PMGD4_CCS",
-    "Mandinga": "MANDINGA_013_PMGD4_MDG",
-    "San_Ramiro": "ELPEUMO_023_PMGD3_PLQ",
-    "El_Castano": "LSCABRAS_015_PMGD4_FEC",
-    "Portezuelos": "SRAFELCQ_012_PMGD7_CDV",
-    "Alhue": "ALHUE_023_PMGD3_ASS",
-    "Santa_Blanca": "ISDMAIPO_012_PMGD8_STB",
-    "Rengo": "RENGO_015_PMGD4_RSS",
-    "Enami": "CATEMU_012_PMGD8_ENM",
+    "Margarita": {
+        "mPoint": "MRCHIGUE_013_PMGD5_TPE",
+        "channel": "3",
+    },
+    "La_Foresta": {
+        "mPoint": "HUALANE_013_PMGD1_LFT",
+        "channel": "3",
+    },
+    "Duqueco": {
+        "mPoint": "DUQUECO_023_PMGD4_CCS",
+        "channel": "3",
+    },
+    "Mandinga": {
+        "mPoint": "MANDINGA_013_PMGD4_MDG",
+        "channel": "3",
+    },
+    "San_Ramiro": {
+        "mPoint": "ELPEUMO_023_PMGD3_PLQ",
+        "channel": "3",
+    },
+    "El_Castano": {
+        "mPoint": "LSCABRAS_015_PMGD4_FEC",
+        "channel": "3",
+    },
+    "Portezuelos": {
+        "mPoint": "SRAFELCQ_012_PMGD7_CDV",
+        "channel": "3",
+    },
+    "Alhue": {
+        "mPoint": "ALHUE_023_PMGD3_ASS",
+        "channel": "3",
+    },
+    "Santa_Blanca": {
+        "mPoint": "ISDMAIPO_012_PMGD8_STB",
+        "channel": "3",
+    },
+    "Rengo": {
+        "mPoint": "RENGO_015_PMGD4_RSS",
+        "channel": "1",
+    },
+    "Enami": {
+        "mPoint": "ATEMU_012_PMGD8_ENM",
+        "channel": "3",
+    },
 }
