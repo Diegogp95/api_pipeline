@@ -52,4 +52,8 @@ measurementPointsMap = {
     "San_Ramiro": "ELPEUMO_023_PMGD3_PLQ",
     "El_Castano": "LSCABRAS_015_PMGD4_FEC",
     "Portezuelos": "SRAFELCQ_012_PMGD7_CDV",
+    "Alhue": "ALHUE_023_PMGD3_ASS",
+    "Santa_Blanca": "ISDMAIPO_012_PMGD8_STB",
+    "Rengo": "RENGO_015_PMGD4_RSS",
+    "Enami": "CATEMU_012_PMGD8_ENM",
 }

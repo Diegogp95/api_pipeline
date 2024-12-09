@@ -1,7 +1,7 @@
 from prmt_api.Consumer import Consumer
 from rev_api import revapi_cli
 from rev_api.plantsMap import plantMap
-import sys, logging
+import sys, logging, getopt
 from utils.utils import setup_logger
 
 class PRMTPipeline:
@@ -25,11 +25,11 @@ class PRMTPipeline:
                 raise ValueError(f"Invalid plant name: {plant}")
         return plant_ids
 
-    def download_prmt_data(self):
+    def download_prmt_data(self, output_format='json'):
         downloaded_paths = []
         for plant in self.plants:
             consumer = Consumer(plant)
-            filename = consumer.pipeline(self.period)
+            filename = consumer.pipeline(self.period, output_format=output_format)
             downloaded_paths.append(filename)
         self.downloaded_paths = downloaded_paths
         return downloaded_paths
@@ -43,10 +43,37 @@ class PRMTPipeline:
 
 
 def main(argv):
-    if len(argv) == 1:
-        if argv[0] not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
-            raise ValueError("Invalid log level")
-        log_level = argv[0]
+    help_message = """
+    Usage: python PRMTPipeline.py <options>
+    """
+    options = "hl:f:"
+    long_options = ["help", "log_level=", "format=", "csv"]
+    log_level = "INFO"
+    output_format = "json"
+
+    try:
+        opts, args = getopt.gnu_getopt(argv, options, long_options)
+    except getopt.GetoptError as e:
+        print(e)
+        print('Invalid arguments')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print(help_message)
+            sys.exit()
+        elif opt in ("-l", "--log_level"):
+            if arg not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
+                print("Invalid log level")
+                sys.exit(2)
+            log_level = arg
+        elif opt in ("-f", "--format"):
+            if arg not in ["json", "csv"]:
+                print("Invalid format")
+                sys.exit(2)
+            output_format = arg
+        elif opt in ("--csv"):
+            output_format = "csv"
+
     plants = input("Enter the plants names (comma separated): ").split(",")
     year = input("Enter the year (YYYY): ")
     while len(year) != 4 or not year.isdigit():
@@ -55,18 +82,16 @@ def main(argv):
     while len(month) != 2 or not month.isdigit() or int(month) < 1 or int(month) > 12:
         month = input("Enter the month (MM): ")
     period = year + month +"010000"
-    if len(argv) == 1:
-        pipeline = PRMTPipeline(plants, period, log_level)
-    else:
-        pipeline = PRMTPipeline(plants, period)
-    pipeline.download_prmt_data()
-    upload = input("Upload data? (y/n): ")
-    while upload != 'y' and upload != 'n':
+    pipeline = PRMTPipeline(plants, period, log_level)
+    pipeline.download_prmt_data(output_format)
+    if output_format == 'json':
         upload = input("Upload data? (y/n): ")
-    if upload == 'y':
-        pipeline.upload_prmt_data()
-        return
-    print("Cancelled")
+        while upload != 'y' and upload != 'n':
+            upload = input("Upload data? (y/n): ")
+        if upload == 'y':
+            pipeline.upload_prmt_data()
+            return
+        print("Cancelled")
     return
 
 

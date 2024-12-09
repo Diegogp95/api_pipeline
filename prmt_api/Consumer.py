@@ -54,16 +54,28 @@ class Consumer:
                         + f"{data['lastReadingDate'].split('+')[0]}")
         for measurement in data['measurement']:
             formatted_data.append({
-                'timestamp': measurement['dateRange'].split('+')[0],
+                'timestamp': measurement['dateRange'].split('.')[0],
                 'act_energy': measurement['channel3'],
             })
         return formatted_data
 
-    def pipeline(self, period, channels="1,2,3,4"):
+    def pipeline(self, period, channels="1,2,3,4", output_format='json'):
         data = self.request_measurements(period, channels)
         if data:
             data = self.format_measurements_data(data)
-            output_path = os.path.join(self.output_path, f'PRMT-{self.plant}-{period}.json')
-            filename = self.save_json_data(data, output_path)
+            if output_format == 'json':
+                output_path = os.path.join(self.output_path, f'PRMT-{self.plant}-{period}.json')
+                filename = self.save_json_data(data, output_path)
+            elif output_format == 'csv':
+                output_path = os.path.join(self.output_path, f'PRMT-{self.plant}-{period}.csv')
+                filename = self.save_csv_data(data, output_path)
             return filename
         return None
+
+    def save_csv_data(self, data, filename):
+        with open(filename, 'w') as f:
+            f.write("timestamp,act_energy\n")
+            for measurement in data:
+                f.write(f"{measurement['timestamp']},{measurement['act_energy']}\n")
+        self.logger.info(f"Data saved to {filename}")
+        return filename
